@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private float moveSpeed;
     public float jumpForce;
-    [SerializeField] float additionalGravity =  10f;
+    [SerializeField] float additionalGravityNormal, additionalGravityFalling =  2f;
     public Transform groundCheck;
     public float checkRadius;
     public LayerMask groundLayer;
@@ -27,11 +27,10 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        // Jump
         if (isGrounded && InputManager.Instance.GetJump)
         {
             characterSwitcher.CurrentRb.AddForce(Vector3.up * jumpForce,ForceMode2D.Impulse);
-            Debug.Log("Jumped");
         }
         
 
@@ -45,11 +44,17 @@ public class PlayerController : MonoBehaviour
         // Adjusting horizontal velocity
         characterSwitcher.CurrentRb.velocity = new Vector2(InputManager.Instance.HorizontalInput * moveSpeed, characterSwitcher.CurrentRb.velocity.y);
         
-        //If falling down
-        if (characterSwitcher.CurrentRb.velocity.y < -0.1f || characterSwitcher.CurrentRb.velocity.y > 0.1f)
+        //If falling down add additional gravity
+        if (!isGrounded)
         {
-            Debug.Log("Falling");
-            characterSwitcher.CurrentRb.AddForce(Vector2.down * additionalGravity);
+            float totalAdditionalGravity = additionalGravityNormal;
+            
+            // Ýncrease additional gravity if falling down
+            if (characterSwitcher.CurrentRb.velocity.y < -0.1f)
+            {
+                totalAdditionalGravity = additionalGravityFalling;
+            }
+            characterSwitcher.CurrentRb.AddForce(Vector2.down * totalAdditionalGravity, ForceMode2D.Impulse);
         }
     }
 
