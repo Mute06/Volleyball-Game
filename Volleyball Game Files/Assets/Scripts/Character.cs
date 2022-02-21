@@ -6,13 +6,7 @@ public class Character : MonoBehaviour
 {
     public Transform groundCheckPoint;
     public float hitForce = 50f;
-    private bool isCurrentlyControlled
-    {
-        get
-        {
-            return CharacterSwitcher.instance.CurrentCharacter == gameObject;
-        }
-    }
+    
 
 
 

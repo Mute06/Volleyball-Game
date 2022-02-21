@@ -5,7 +5,6 @@ using Sirenix.OdinInspector;
 
 public class CharacterSwitcher : MonoBehaviour
 {
-    public static CharacterSwitcher instance { get; private set; }
 
     [AssetsOnly]
     public GameObject spiritPrefab;
@@ -39,13 +38,6 @@ public class CharacterSwitcher : MonoBehaviour
         SwitchCharacter(characters[currentCharacterIndex]);
     }
 
-    private void Awake()
-    {
-        if (instance == null)
-        {
-            instance = this;
-        }
-    }
 
     // Update is called once per frame
     void Update()
@@ -89,5 +81,11 @@ public class CharacterSwitcher : MonoBehaviour
             SwitchCharacter(characters[currentCharacterIndex + 1]);
             currentCharacterIndex += 1;
         }
+    }
+
+    public void SwitchToInitialCharacter()
+    {
+        SwitchCharacter(characters[0]);
+        currentCharacterIndex = 0;
     }
 }

@@ -26,20 +26,9 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
-    public bool isGameStarted { get; private set; }
-
+    public CharacterSwitcher characterSwitcher;
     public UiManager UI_Manager;
 
-    private void Start()
-    {
-        StartCoroutine(StartTheRound(1.5f));
-    }
-
-    private IEnumerator StartTheRound(float seconds)
-    {
-        yield return new WaitForSeconds(seconds);
-        isGameStarted = true;
-    }
 
     public void RestartRound()
     {
@@ -52,5 +41,11 @@ public class GameManager : MonoBehaviour
         // add here a transition
 
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void StartRound()
+    {
+        UI_Manager.Score = 0;
+        // Show the player round started in UI
     }
 }

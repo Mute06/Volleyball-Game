@@ -7,14 +7,22 @@ public class Ball : MonoBehaviour
 {
     private Rigidbody2D rb;
     [SerializeField] float hitForce;
-
+    [SerializeField] private Transform startPosition;
+    [SerializeField] private float waitToRestartRound = 2f;
 
     private bool didStopped;
+    private Collider2D colliderComponent;
+    private FlyTowards flyTowards;
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-    }
+        colliderComponent = GetComponent<Collider2D>();
+        flyTowards = GetComponent<FlyTowards>();
+        flyTowards.target = startPosition;
+        flyTowards.OnReachedTarget += OnReachedStartPoint;
 
+
+    }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -26,24 +34,14 @@ public class Ball : MonoBehaviour
             ApplyBounceForce(direction, force);
             Debug.Log("Aplied force" + direction);
         }
-        else
+        else if (collision.gameObject.CompareTag("Ground"))
         {
-            //rb.velocity = Vector2.zero;
-            var direction = -(collision.GetContact(0).point - rb.position).normalized;
-            ApplyBounceForce(direction , hitForce);
+            StopBall();
         }
     }
 
-    private void Update()
-    {
-        if (GameManager.Instance.isGameStarted)
-        {
-            if (!didStopped && rb.velocity.magnitude <= 0.1f)
-            {
-                //StopBall();
-            }
-        }
-    }
+
+    
 
     private void ApplyBounceForce(Vector2 direction , float forceFactor)
     {
@@ -60,8 +58,28 @@ public class Ball : MonoBehaviour
             // Stop the ball
             rb.velocity = Vector3.zero;
 
-            // Restart the round
-            GameManager.Instance.RestartRound();
+            colliderComponent.enabled = false;
+            flyTowards.isUsing = true;
+            rb.Sleep();
+            rb.bodyType = RigidbodyType2D.Kinematic;
+
+            
         }
     }
+
+    private void OnReachedStartPoint()
+    {
+        colliderComponent.enabled = true;
+        didStopped = false;
+        StartCoroutine(StartAfterWait());
+        GameManager.Instance.characterSwitcher.SwitchToInitialCharacter();
+    }
+    private IEnumerator StartAfterWait()
+    {
+        yield return new WaitForSeconds(waitToRestartRound);
+        GameManager.Instance.StartRound();
+        rb.WakeUp();
+        rb.bodyType = RigidbodyType2D.Dynamic;
+    }
+
 }
